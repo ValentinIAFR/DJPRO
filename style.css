@@ -6,7 +6,7 @@ body{
 }
 
 .app{
-    max-width:900px;
+    max-width:950px;
     margin:auto;
     padding:25px;
 }
@@ -15,30 +15,30 @@ h1{
     font-size:28px;
     font-weight:600;
     letter-spacing:1px;
-    color:#ffffff;
+    color:#fff;
 }
 
-/* inputs classiques */
-input:not([type="file"]){
-    width:100%;
-    padding:16px;
-    border-radius:8px;
-    border:1px solid #1f1f24;
-    background:#141418;
-    color:#aaa;
-    margin:20px 0;
-}
-
-/* input fichier (plus compact) */
+/* FILE INPUT */
 input[type="file"]{
-    width:420px;      /* ← change cette valeur si tu veux */
-    padding:10px;
+    width:420px;
+    padding:6px;
 }
 
-
-input:hover{
-    border-color:#2f8cff;
+input[type="file"]::file-selector-button{
+    background:#0a1f44;
+    color:white;
+    border:none;
+    padding:10px 16px;
+    margin-right:10px;
+    border-radius:6px;
+    cursor:pointer;
 }
+
+input[type="file"]::file-selector-button:hover{
+    background:#12306a;
+}
+
+/* TRACK LIST */
 
 ul{
     list-style:none;
@@ -68,10 +68,6 @@ li:hover{
     box-shadow:0 0 15px rgba(47,140,255,0.4);
 }
 
-li strong{
-    color:#fff;
-}
-
 li span{
     font-size:12px;
     color:#8a8a8f;
@@ -79,7 +75,6 @@ li span{
 
 .energy{
     background:linear-gradient(135deg,#ff2d55,#ff9500);
-    color:white;
     padding:6px 12px;
     border-radius:5px;
     font-size:12px;
@@ -87,10 +82,10 @@ li span{
 }
 
 h2{
-    font-size:14px;
+    font-size:13px;
     color:#8a8a8f;
     text-transform:uppercase;
-    margin-top:25px;
+    margin-top:28px;
 }
 
 #suggestion{
@@ -99,25 +94,4 @@ h2{
     background:#111114;
     border-radius:8px;
     border:1px solid #1f1f24;
-}
-
-/* bouton choisir les fichiers */
-input[type="file"]::file-selector-button{
-    background:#0a1f44; /* bleu minuit */
-    color:white;
-    border:none;
-    padding:10px 16px;
-    margin-right:15px;
-    border-radius:6px;
-    font-weight:500;
-    cursor:pointer;
-    transition:0.2s;
-}
-
-input[type="file"]::file-selector-button:hover{
-    background:#12306a;
-}
-
-input[type="file"]::file-selector-button:active{
-    background:#07152e;
 }
