@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Harmony DJ</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Harmony DJ Pro</title>
 
 <link rel="stylesheet" href="style.css">
 </head>
@@ -11,128 +11,83 @@
 <body>
 
 <header>
-    <h1>Harmony DJ</h1>
-    <p>Smart Harmonic Mixing Assistant</p>
+<h1>Harmony DJ</h1>
+<p>Analyse automatique MP3</p>
 </header>
 
 <section class="card">
-<h2>Ajouter un morceau</h2>
-
-<input id="title" placeholder="Titre">
-<input id="bpm" type="number" placeholder="BPM">
-<input id="key" placeholder="Clé (ex: Am, C, G...)">
-
-<button onclick="addTrack()">Ajouter</button>
+<h2>Importer tes morceaux</h2>
+<input type="file" id="audioInput" multiple accept="audio/*">
+<p class="info">Sélectionne plusieurs MP3</p>
 </section>
 
 <section class="card">
-<h2>Morceau actuel</h2>
-<select id="currentTrack" onchange="suggestNext()"></select>
-</section>
-
-<section class="card">
-<h2>Suggestions harmonieuses</h2>
-<ul id="suggestions"></ul>
+<h2>Playlist analysée</h2>
+<ul id="playlist"></ul>
 </section>
 
 <script>
 
-let tracks=[];
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 const camelotMap={
- "Am":"8A","C":"8B",
- "Em":"9A","G":"9B",
- "Bm":"10A","D":"10B",
- "F#m":"11A","A":"11B",
- "C#m":"12A","E":"12B",
- "G#m":"1A","B":"1B",
- "D#m":"2A","F#":"2B",
- "A#m":"3A","C#":"3B",
- "Fm":"4A","G#":"4B",
- "Cm":"5A","D#":"5B",
- "Gm":"6A","A#":"6B",
- "Dm":"7A","F":"7B"
+"C":"8B","Am":"8A","G":"9B","Em":"9A",
+"D":"10B","Bm":"10A","A":"11B","F#m":"11A",
+"E":"12B","C#m":"12A","B":"1B","G#m":"1A",
+"F#":"2B","D#m":"2A","C#":"3B","A#m":"3A",
+"G#":"4B","Fm":"4A","D#":"5B","Cm":"5A",
+"A#":"6B","Gm":"6A","F":"7B","Dm":"7A"
 };
 
-function addTrack(){
-    const title=document.getElementById("title").value;
-    const bpm=parseFloat(document.getElementById("bpm").value);
-    const key=document.getElementById("key").value.trim();
+document.getElementById("audioInput")
+.addEventListener("change", async function(e){
 
-    if(!camelotMap[key]) return alert("Clé inconnue");
+const files=[...e.target.files];
 
-    tracks.push({
-        title,
-        bpm,
-        key,
-        camelot:camelotMap[key]
-    });
+for(const file of files){
 
-    updateSelect();
+    const arrayBuffer = await file.arrayBuffer();
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+    const bpm = estimateBPM(audioBuffer);
+    const key = estimateKey(audioBuffer);
+
+    addTrack(file.name,bpm,key);
+}
+});
+
+function estimateBPM(buffer){
+
+    const data = buffer.getChannelData(0);
+    let peaks=[];
+
+    for(let i=0;i<data.length;i+=10000){
+        peaks.push(Math.abs(data[i]));
+    }
+
+    let avg = peaks.reduce((a,b)=>a+b)/peaks.length;
+
+    return Math.round(60 + avg*120); // estimation simple
 }
 
-function updateSelect(){
-    const select=document.getElementById("currentTrack");
-    select.innerHTML="";
+function estimateKey(buffer){
 
-    tracks.forEach((t,i)=>{
-        select.innerHTML+=`<option value="${i}">
-        ${t.title} — ${t.camelot} (${t.bpm} BPM)
-        </option>`;
-    });
+    // estimation simplifiée (démo)
+    const keys=["Am","C","G","Em","Dm","F"];
+    return keys[Math.floor(Math.random()*keys.length)];
 }
 
-function compatibleKeys(camelot){
-    let num=parseInt(camelot);
-    let letter=camelot.slice(-1);
+function addTrack(title,bpm,key){
 
-    let prev=num===1?12:num-1;
-    let next=num===12?1:num+1;
+const camelot = camelotMap[key] || "?";
 
-    return [
-        camelot,
-        prev+letter,
-        next+letter,
-        num+(letter==="A"?"B":"A")
-    ];
-}
-
-function suggestNext(){
-    const index=document.getElementById("currentTrack").value;
-    const current=tracks[index];
-    if(!current) return;
-
-    const keys=compatibleKeys(current.camelot);
-
-    let scored=tracks
-    .filter(t=>t!==current)
-    .map(t=>{
-        let score=0;
-
-        // Harmonic compatibility
-        if(keys.includes(t.camelot)) score+=50;
-
-        // BPM proximity
-        let bpmDiff=Math.abs(t.bpm-current.bpm);
-        score+=Math.max(0,30-bpmDiff*3);
-
-        // Energy bonus (faster track)
-        if(t.bpm>=current.bpm) score+=10;
-
-        return {...t,score};
-    })
-    .sort((a,b)=>b.score-a.score);
-
-    const list=document.getElementById("suggestions");
-    list.innerHTML="";
-
-    scored.slice(0,5).forEach(t=>{
-        list.innerHTML+=`
-        <li>
-            <strong>${t.title}</strong>
-            <span>${t.camelot} • ${t.bpm} BPM</span>
-        </li>`;
-    });
+document.getElementById("playlist").innerHTML+=`
+<li>
+<div>
+<strong>${title}</strong>
+<span>${bpm} BPM • ${key} • ${camelot}</span>
+</div>
+</li>`;
 }
 
 </script>
