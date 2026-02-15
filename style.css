@@ -18,7 +18,6 @@ h1{
     color:#fff;
 }
 
-/* FILE INPUT */
 input[type="file"]{
     width:420px;
     padding:6px;
@@ -37,8 +36,6 @@ input[type="file"]::file-selector-button{
 input[type="file"]::file-selector-button:hover{
     background:#12306a;
 }
-
-/* TRACK LIST */
 
 ul{
     list-style:none;
