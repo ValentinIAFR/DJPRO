@@ -2,138 +2,191 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DJ Flow Assistant</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DJ Flow PRO</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <div class="app">
-
-<h1>DJ Flow Assistant</h1>
+<h1>DJ Flow PRO</h1>
 
 <input type="file" id="fileInput" multiple accept=".mp3">
 
-<h2>Morceaux importés</h2>
+<h2>Tracks analysés</h2>
 <ul id="trackList"></ul>
 
-<h2>Suggestion suivante</h2>
-<div id="suggestion">Importe des morceaux...</div>
-
+<h2>Next Suggestion</h2>
+<div id="suggestion">Importe des morceaux</div>
 </div>
 
 <script>
 
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 const tracks = [];
 
-const camelotMap = {
- "C":"8B","Am":"8A",
- "G":"9B","Em":"9A",
- "D":"10B","Bm":"10A",
- "A":"11B","F#m":"11A",
- "E":"12B","C#m":"12A",
- "B":"1B","G#m":"1A",
- "F#":"2B","D#m":"2A",
- "Db":"3B","Bbm":"3A",
- "Ab":"4B","Fm":"4A",
- "Eb":"5B","Cm":"5A",
- "Bb":"6B","Gm":"6A",
- "F":"7B","Dm":"7A"
-};
+const camelotWheel = ["1A","2A","3A","4A","5A","6A","7A","8A","9A","10A","11A","12A"];
 
-function normalizeBPM(bpm){
-    if(bpm < 70) bpm *= 2;
-    else if(bpm < 95) bpm *= 1.5;
-    else if(bpm > 155) bpm /= 2;
-    return Math.round(bpm);
-}
+document.getElementById("fileInput").addEventListener("change", async e => {
 
-function normalizeKey(key){
-    const corrections = {
-        "G":"Em",
-        "C":"Am",
-        "D":"Bm",
-        "F":"Dm"
-    };
-    return corrections[key] || key;
-}
+ for(const file of e.target.files){
+    const arrayBuffer = await file.arrayBuffer();
+    const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
 
-document.getElementById("fileInput")
-.addEventListener("change", async e => {
+    const bpm = detectBPM(audioBuffer);
+    const energy = detectEnergy(audioBuffer);
+    const key = detectKey(audioBuffer);
 
-    for(const file of e.target.files){
+    tracks.push({
+        title:file.name,
+        bpm,
+        energy,
+        key
+    });
+ }
 
-        const audio = new Audio(URL.createObjectURL(file));
-        await audio.play().catch(()=>{});
-        audio.pause();
-
-        // BPM simulé (analyse web limitée)
-        let bpm = 80 + Math.random()*60;
-        bpm = normalizeBPM(bpm);
-
-        const possibleKeys = ["Am","Em","Dm","F#m","G","C","Bm"];
-        let key = possibleKeys[Math.floor(Math.random()*possibleKeys.length)];
-        key = normalizeKey(key);
-
-        tracks.push({
-            title:file.name,
-            bpm,
-            key,
-            camelot: camelotMap[key] || "?"
-        });
-    }
-
-    renderTracks();
-    suggestNext();
+ renderTracks();
+ suggestNext();
 });
 
-function renderTracks(){
 
-    const list = document.getElementById("trackList");
-    list.innerHTML = "";
+// ================= BPM DETECTION =================
+function detectBPM(buffer){
 
-    tracks.forEach(t=>{
-        const li = document.createElement("li");
-        li.innerHTML =
-            `<strong>${t.title}</strong>
-             <span>${t.bpm} BPM • ${t.key} • ${t.camelot}</span>`;
-        list.appendChild(li);
-    });
+ const data = buffer.getChannelData(0);
+ const sampleRate = buffer.sampleRate;
+
+ let peaks = [];
+
+ for(let i=0;i<data.length;i+=1024){
+     if(data[i] > 0.9) peaks.push(i);
+ }
+
+ let intervals = {};
+
+ peaks.forEach((peak,i)=>{
+   for(let j=1;j<10;j++){
+     if(peaks[i+j]){
+        let interval = peaks[i+j]-peak;
+        let tempo = 60/(interval/sampleRate);
+
+        while(tempo<80) tempo*=2;
+        while(tempo>160) tempo/=2;
+
+        tempo=Math.round(tempo);
+
+        intervals[tempo]=(intervals[tempo]||0)+1;
+     }
+   }
+ });
+
+ let best = Object.entries(intervals)
+      .sort((a,b)=>b[1]-a[1])[0];
+
+ return best ? best[0] : 120;
 }
 
+
+// ================= ENERGY ANALYSIS =================
+function detectEnergy(buffer){
+
+ const data = buffer.getChannelData(0);
+ let sum = 0;
+
+ for(let i=0;i<data.length;i+=500){
+     sum += Math.abs(data[i]);
+ }
+
+ let energy = (sum / (data.length/500))*100;
+ return Math.min(100,Math.round(energy*3));
+}
+
+
+// ================= SIMPLE KEY ESTIMATION =================
+function detectKey(buffer){
+
+ const analyser = audioCtx.createAnalyser();
+ analyser.fftSize = 2048;
+
+ const source = audioCtx.createBufferSource();
+ source.buffer = buffer;
+ source.connect(analyser);
+
+ const freqData = new Uint8Array(analyser.frequencyBinCount);
+ analyser.getByteFrequencyData(freqData);
+
+ let max = 0;
+ let index = 0;
+
+ freqData.forEach((v,i)=>{
+   if(v>max){
+     max=v;
+     index=i;
+   }
+ });
+
+ const camelotIndex = index % 12;
+ return camelotWheel[camelotIndex];
+}
+
+
+// ================= UI =================
+function renderTracks(){
+
+ const list=document.getElementById("trackList");
+ list.innerHTML="";
+
+ tracks.forEach(t=>{
+   const li=document.createElement("li");
+
+   li.innerHTML=`
+     <div>
+       <strong>${t.title}</strong>
+       <span>${t.bpm} BPM • ${t.key}</span>
+     </div>
+     <div class="energy">${t.energy}</div>
+   `;
+
+   list.appendChild(li);
+ });
+}
+
+
+// ================= DJ SUGGESTION =================
 function camelotDistance(a,b){
-    if(!a || !b) return 99;
-    const n1 = parseInt(a);
-    const n2 = parseInt(b);
-    return Math.min(Math.abs(n1-n2),12-Math.abs(n1-n2));
+ const n1=parseInt(a);
+ const n2=parseInt(b);
+ return Math.min(Math.abs(n1-n2),12-Math.abs(n1-n2));
 }
 
 function suggestNext(){
 
-    if(tracks.length < 2) return;
+ if(tracks.length<2) return;
 
-    const current = tracks[tracks.length-1];
+ const current=tracks[tracks.length-1];
 
-    let best = null;
-    let bestScore = 999;
+ let best=null;
+ let bestScore=999;
 
-    tracks.slice(0,-1).forEach(t=>{
+ tracks.slice(0,-1).forEach(t=>{
 
-        const bpmDiff = Math.abs(t.bpm-current.bpm);
-        const keyDiff = camelotDistance(t.camelot,current.camelot);
+   const bpmDiff=Math.abs(t.bpm-current.bpm);
+   const keyDiff=camelotDistance(t.key,current.key);
+   const energyDiff=Math.abs(t.energy-current.energy);
 
-        const score = bpmDiff + keyDiff*10;
+   const score=bpmDiff + keyDiff*8 + energyDiff*0.5;
 
-        if(score < bestScore){
-            bestScore = score;
-            best = t;
-        }
-    });
+   if(score<bestScore){
+      bestScore=score;
+      best=t;
+   }
+ });
 
-    document.getElementById("suggestion").innerHTML =
-        `<strong>${best.title}</strong><br>
-         ${best.bpm} BPM • ${best.key} • ${best.camelot}`;
+ document.getElementById("suggestion").innerHTML=
+ `<strong>${best.title}</strong><br>
+ ${best.bpm} BPM • ${best.key}<br>
+ Energy ${best.energy}`;
 }
 
 </script>
