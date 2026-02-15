@@ -37,7 +37,7 @@ const camelotWheel =
 ["1A","2A","3A","4A","5A","6A","7A","8A","9A","10A","11A","12A"];
 
 
-/* ================= SAVE SYSTEM ================= */
+/* ================= SAVE ================= */
 
 function saveData(){
     localStorage.setItem("dj_tracks", JSON.stringify(tracks));
@@ -177,7 +177,7 @@ function transitionScore(track,target){
 }
 
 
-/* ================= AUTO ENERGY ORDER ================= */
+/* ================= ENERGY ORDER ================= */
 
 function autoEnergySort(){
    tracks.sort((a,b)=>a.energy-b.energy);
@@ -217,7 +217,10 @@ function renderTracks(){
 
    li.onclick=()=>{
       currentTrack=track;
-      history.push(track.title);
+
+      if(!history.includes(track.title)){
+          history.push(track.title);
+      }
 
       saveData();
       renderTracks();
@@ -247,16 +250,30 @@ function renderHistory(){
 
 function updateSuggestion(){
 
- if(!currentTrack) return;
+ if(!currentTrack){
+    document.getElementById("suggestion").innerHTML =
+      "Choisis un morceau actuel";
+    return;
+ }
 
- const others=tracks.filter(t=>t.title!==currentTrack.title);
+ /* EXCLUT LES MORCEAUX DEJA JOUÉS */
+ const available = tracks.filter(t =>
+     t.title !== currentTrack.title &&
+     !history.includes(t.title)
+ );
 
- others.sort((a,b)=>
+ if(available.length === 0){
+    document.getElementById("suggestion").innerHTML =
+      "✅ Tous les morceaux ont été joués";
+    return;
+ }
+
+ available.sort((a,b)=>
    transitionScore(a,currentTrack) -
    transitionScore(b,currentTrack)
  );
 
- const best=others[0];
+ const best=available[0];
 
  document.getElementById("suggestion").innerHTML=
  `<strong>${best.title}</strong><br>
@@ -265,7 +282,7 @@ function updateSuggestion(){
 }
 
 
-/* ================= RESTORE SESSION ================= */
+/* ================= RESTORE ================= */
 
 const savedCurrent = localStorage.getItem("dj_current");
 
