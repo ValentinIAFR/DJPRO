@@ -18,7 +18,8 @@ h1{
     color:#ffffff;
 }
 
-input{
+/* inputs classiques */
+input:not([type="file"]){
     width:100%;
     padding:16px;
     border-radius:8px;
@@ -27,6 +28,13 @@ input{
     color:#aaa;
     margin:20px 0;
 }
+
+/* input fichier (plus compact) */
+input[type="file"]{
+    width:420px;      /* ← change cette valeur si tu veux */
+    padding:10px;
+}
+
 
 input:hover{
     border-color:#2f8cff;
