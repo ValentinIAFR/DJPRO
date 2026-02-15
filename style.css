@@ -141,3 +141,10 @@ h2{
 ::-webkit-scrollbar-thumb:hover{
     background:#3a3a42;
 }
+
+.current{
+    border:1px solid #2f8cff !important;
+    background:#1a2230 !important;
+    box-shadow:0 0 15px rgba(47,140,255,0.4);
+}
+
