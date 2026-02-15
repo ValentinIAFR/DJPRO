@@ -1,20 +1,13 @@
-/* Apple system font */
 body{
     margin:0;
-    font-family:-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif;
     background:#f2f2f7;
     color:#1c1c1e;
 }
 
-/* Top bar style iOS */
-.topbar{
-    position:sticky;
-    top:0;
-    backdrop-filter: blur(20px);
-    background:rgba(255,255,255,0.7);
-    padding:20px;
+header{
     text-align:center;
-    border-bottom:1px solid #e5e5ea;
+    padding:40px 20px 20px;
 }
 
 h1{
@@ -22,68 +15,60 @@ h1{
     font-weight:600;
 }
 
-/* Layout */
-main{
-    padding:15px;
+p{
+    color:#8e8e93;
 }
 
-/* Apple cards */
 .card{
     background:white;
-    border-radius:20px;
-    padding:20px;
-    margin-bottom:18px;
-    box-shadow:
-        0 4px 20px rgba(0,0,0,0.05);
+    margin:18px;
+    padding:22px;
+    border-radius:22px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.06);
 }
 
-/* Inputs Apple style */
-input, textarea{
+h2{
+    margin-top:0;
+}
+
+input,select{
     width:100%;
-    padding:12px;
+    padding:14px;
     margin-top:10px;
-    border-radius:12px;
+    border-radius:14px;
     border:none;
     background:#f2f2f7;
     font-size:16px;
 }
 
-textarea{
-    height:100px;
-    resize:none;
-}
-
-/* Apple button */
 button{
-    margin-top:12px;
+    margin-top:14px;
     width:100%;
     padding:14px;
     border:none;
-    border-radius:14px;
+    border-radius:16px;
     background:#007AFF;
     color:white;
     font-size:16px;
     font-weight:500;
 }
 
-/* Focus timer */
-.focus{
-    text-align:center;
-}
-
-#timer{
-    font-size:48px;
-    font-weight:600;
-    margin:10px 0;
-}
-
-/* List */
 ul{
     list-style:none;
     padding:0;
 }
 
 li{
-    padding:10px;
+    display:flex;
+    justify-content:space-between;
+    padding:14px;
     border-bottom:1px solid #eee;
+}
+
+li strong{
+    font-weight:500;
+}
+
+li span{
+    color:#8e8e93;
 }
