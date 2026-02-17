@@ -102,43 +102,6 @@ save();
 renderAll();
 });
 
-/* ========= PLAYER + WAVEFORM ========= */
-
-async function previewTrack(track){
-
-audio.src=URL.createObjectURL(track.file);
-audio.play();
-
-const arrayBuffer=await track.file.arrayBuffer();
-const buffer=await audioCtx.decodeAudioData(arrayBuffer);
-
-drawWaveform(buffer);
-}
-
-function drawWaveform(buffer){
-
-const data=buffer.getChannelData(0);
-const step=Math.floor(data.length/canvas.width);
-
-ctx.clearRect(0,0,canvas.width,canvas.height);
-ctx.beginPath();
-
-for(let i=0;i<canvas.width;i++){
-let min=1,max=-1;
-
-for(let j=0;j<step;j++){
-const datum=data[(i*step)+j];
-if(datum<min)min=datum;
-if(datum>max)max=datum;
-}
-
-ctx.moveTo(i,(1+min)*60);
-ctx.lineTo(i,(1+max)*60);
-}
-
-ctx.strokeStyle="#2f8cff";
-ctx.stroke();
-}
 
 /* ========= DJ LOGIC ========= */
 
