@@ -1,101 +1,112 @@
 body{
-    margin:0;
-    background:#0b0b0d;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-    color:#e6e6e6;
+margin:0;
+background:#0b0b0d;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+color:#e6e6e6;
 }
 
 .app{
-    max-width:950px;
-    margin:auto;
-    padding:25px;
+max-width:950px;
+margin:auto;
+padding:25px;
 }
 
-h1{
-    font-size:28px;
-    color:#fff;
-}
+h1{color:#fff;}
 
-/* ===== BUTTONS ===== */
-
-.buttons{
-    margin:15px 0;
-}
+.buttons{margin:15px 0;}
 
 button{
-    background:#0a1f44;
-    color:white;
-    border:none;
-    padding:10px 16px;
-    margin-right:10px;
-    border-radius:6px;
-    cursor:pointer;
-    font-weight:500;
+background:#0a1f44;
+color:white;
+border:none;
+padding:10px 16px;
+margin-right:10px;
+border-radius:6px;
+cursor:pointer;
 }
 
-button:hover{
-    background:#12306a;
-}
-
-/* ===== FILE INPUT ===== */
+button:hover{background:#12306a;}
 
 input[type="file"]{
-    width:420px;
-    padding:6px;
+width:420px;
+padding:6px;
 }
 
 input[type="file"]::file-selector-button{
-    background:#0a1f44;
-    color:white;
-    border:none;
-    padding:10px 16px;
-    margin-right:10px;
-    border-radius:6px;
-    cursor:pointer;
+background:#0a1f44;
+color:white;
+border:none;
+padding:10px 16px;
+margin-right:10px;
+border-radius:6px;
+cursor:pointer;
 }
 
-/* ===== LIST ===== */
+/* SEARCH BAR */
 
-ul{
-    list-style:none;
-    padding:0;
+#searchBar{
+width:100%;
+padding:12px;
+margin:15px 0;
+background:#141418;
+border:1px solid #1f1f24;
+border-radius:6px;
+color:white;
 }
+
+/* LIST */
+
+ul{list-style:none;padding:0;}
 
 li{
-    background:#111114;
-    border:1px solid #1c1c20;
-    margin-bottom:8px;
-    padding:14px 16px;
-    border-radius:6px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+background:#111114;
+border:1px solid #1c1c20;
+margin-bottom:8px;
+padding:14px 16px;
+border-radius:6px;
+display:flex;
+justify-content:space-between;
 }
 
 li:hover{
-    background:#17171c;
-    border-color:#2f8cff;
+background:#17171c;
+border-color:#2f8cff;
 }
 
 .energy{
-    background:linear-gradient(135deg,#ff2d55,#ff9500);
-    padding:6px 12px;
-    border-radius:5px;
-    font-size:12px;
-    font-weight:600;
+background:linear-gradient(135deg,#ff2d55,#ff9500);
+padding:6px 12px;
+border-radius:5px;
+font-size:12px;
+font-weight:600;
+}
+
+/* SUGGESTIONS */
+
+#suggestion{
+display:flex;
+gap:10px;
+margin-top:10px;
+}
+
+.suggestItem{
+flex:1;
+background:#111114;
+border:1px solid #1f1f24;
+padding:15px;
+border-radius:8px;
+cursor:pointer;
+transition:.2s;
+}
+
+.suggestItem:hover{
+border-color:#2f8cff;
+background:#17171c;
 }
 
 h2{
-    font-size:13px;
-    color:#8a8a8f;
-    text-transform:uppercase;
-    margin-top:28px;
-}
-
-#suggestion{
-    margin-top:15px;
-    padding:20px;
-    background:#111114;
-    border-radius:8px;
-    border:1px solid #1f1f24;
+font-size:13px;
+color:#8a8a8f;
+text-transform:uppercase;
+margin-top:28px;
 }
